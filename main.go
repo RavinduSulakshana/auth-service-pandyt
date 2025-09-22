@@ -27,22 +27,22 @@ func main() {
 
 	//Initialize Handlers
 	authHandler := handlers.NewAuthHandler(db, jwtManager)
-	adminHandler := handlers.AdminHandler(db, config.AdminKey)
+	adminHandler := handlers.NewAdminHandle(db, config.AdminKey)
 
 	//setup routes
 	mux := http.NewServeMux()
 
 	//public routes
 	mux.HandleFunc("POST /auth/signup", authHandler.SignUp)
-	mux.HandleFunc("POST /auth./login", authHandler.Login)
+	mux.HandleFunc("POST /auth/login", authHandler.Login)
 	mux.HandleFunc("POST /auth/refresh", authHandler.RefreshToken)
 
 	//protected routes
 	mux.Handle("GET /auth/profile", authHandler.AuthMiddleware(http.HandleFunc(authHandler.Profile)))
-	mux.HandleFunc("POST /auth/logout", authHandler.AuthMiddleware(http.HandleFunc(AuthMiddleware.Logout)))
+	mux.HandleFunc("POST /auth/logout", authHandler.AuthMiddleware(http.HandleFunc(authMiddleware.Logout)))
 
 	//Admin routes
-	mux.HandleFunc("GET /admin/health", adminHandler.health)
+	mux.HandleFunc("GET /admin/health", adminHandler.Health)
 
 	// add CORS AuthMiddleware
 	handler := corsMiddleware(mux)

@@ -11,7 +11,7 @@ type User struct {
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 }
 
-type loginRequest struct {
+type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
@@ -31,6 +31,6 @@ type RefreshToken struct {
 }
 
 type TokenResponse struct {
-	AccessToken  string `json:"access_toke"`
+	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }

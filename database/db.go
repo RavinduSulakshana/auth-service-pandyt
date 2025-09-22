@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"github.com/RavinduSulakshana/auth-service-pandyt/models"
 	_ "github.com/mattn/go-sqlite3"
-	"time"
 )
 
 type DB struct {

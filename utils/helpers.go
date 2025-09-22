@@ -20,7 +20,7 @@ type Config struct {
 func LoadConfig() *Config {
 	return &Config{
 		Port:           getEnv("PORT", "8080"),
-		DBPath:         getEnv("DB_Path", "./auth.db"),
+		DBPath:         getEnv("DB_PATH", "./auth.db"),
 		JWTSecret:      getEnv("JWT_SECRET", "default_secret"),
 		JWTExpiryHours: getEnvAsInt("JWT_EXPIRY_HOURS", 24),
 		AdminKey:       getEnv("ADMIN_KEY", "ADMIN_KEY"),
@@ -55,4 +55,9 @@ func WriteJSON(w http.ResponseWriter, statusCode int, data interface{}) {
 
 func SerUserID(ctx context.Context, userID string) context.Context {
 	return context.WithValue(ctx, "user_id", userID)
+}
+func WriteError(w http.ResponseWriter, statusCode int, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(map[string]string{"error": message})
 }
