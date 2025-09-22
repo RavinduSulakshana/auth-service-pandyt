@@ -1,8 +1,8 @@
 package database
 
 import (
-	"auth-service/models"
 	"database/sql"
+	"github.com/RavinduSulakshana/auth-service-pandyt/models"
 	_ "github.com/mattn/go-sqlite3"
 	"time"
 )
@@ -12,7 +12,7 @@ type DB struct {
 }
 
 func New(dbpath string) (*DB, error) {
-	conn, err := sql.Open("go-sqlite3", dbpath)
+	conn, err := sql.Open("sqlite3", dbpath)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (db *DB) GetUserByEmail(email string) (*models.User, error) {
 	user := &models.User{}
 
 	err := db.conn.QueryRow(query, email).Scan(
-		&user.ID, &user.Email, &user.Password, &user.first_name, &user.FirstName, &user.LastName, &user.CreatedAt,
+		&user.ID, &user.Email, &user.Password, &user.FirstName, &user.LastName, &user.CreatedAt,
 	)
 
 	if err == sql.ErrNoRows {
@@ -83,7 +83,7 @@ func (db *DB) GetUserByID(id string) (*models.User, error) {
 	user := &models.User{}
 
 	err := db.conn.QueryRow(query, id).Scan(
-		&user.ID, &user.Email, &user.Password, &user.first_name, &user.FirstName, &user.LastName, &user.CreatedAt,
+		&user.ID, &user.Email, &user.Password, &user.FirstName, &user.LastName, &user.CreatedAt,
 	)
 
 	if err == sql.ErrNoRows {

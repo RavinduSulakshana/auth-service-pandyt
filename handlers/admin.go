@@ -1,9 +1,9 @@
 package handlers
 
 import (
+	"github.com/RavinduSulakshana/auth-service-pandyt/database"
+	"github.com/RavinduSulakshana/auth-service-pandyt/utils"
 	"net/http"
-	"simple-auth/database"
-	"simple-auth/utils"
 )
 
 type AdminHandler struct {

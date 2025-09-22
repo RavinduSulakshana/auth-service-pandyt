@@ -8,9 +8,9 @@ import (
 	"github.com/RavinduSulakshana/auth-service-pandyt/auth"
 	"github.com/RavinduSulakshana/auth-service-pandyt/database"
 	"github.com/RavinduSulakshana/auth-service-pandyt/models"
+	"github.com/RavinduSulakshana/auth-service-pandyt/utils"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm/utils"
-	"modernc.org/libc/uuid"
 	"strings"
 )
 
@@ -19,10 +19,10 @@ type AuthHandler struct {
 	jwtManager *auth.JWTManager
 }
 
-func NewAuthHandler(db *database.DB, jwtmanager *auth.JWTManager) *AuthHandler {
+func NewAuthHandler(db *database.DB, jwtManager *auth.JWTManager) *AuthHandler {
 	return &AuthHandler{
 		db:         db,
-		jwtmanager: jwtmanager,
+		jwtManager: auth.jwtManager,
 	}
 }
 
