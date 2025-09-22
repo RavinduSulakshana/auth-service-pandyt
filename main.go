@@ -27,7 +27,7 @@ func main() {
 
 	//Initialize Handlers
 	authHandler := handlers.NewAuthHandler(db, jwtManager)
-	adminHandler := handlers.NewAdminHandle(db, config.AdminKey)
+	adminHandler := handlers.NewAdminHandler(db, config.AdminKey)
 
 	//setup routes
 	mux := http.NewServeMux()
