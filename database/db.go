@@ -42,7 +42,7 @@ func (db *DB) createTables() error {
 		user_id TEXT NOT NULL,
 		token_hash TEXT NOT NULL,
 		expires_at DATETIME NOT NULL,
-		FOREIGN KEY (user_id) REFERENCES user(id)
+		FOREIGN KEY (user_id) REFERENCES users(id)
 	)
 	`
 	if _, err := db.conn.Exec(userTable); err != nil {
@@ -118,7 +118,7 @@ func (db *DB) DeleteRefreshToken(token_hash string) error {
 	return err
 }
 
-func (db *DB) DeleteUserToken(userId string) error {
+func (db *DB) DeleteUserTokens(userId string) error {
 	query := `DELETE FROM refresh_tokens WHERE user_id=?`
 	_, err := db.conn.Exec(query, userId)
 

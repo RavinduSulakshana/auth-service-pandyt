@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"time"
+	"unicode"
 
 	"github.com/RavinduSulakshana/auth-service-pandyt/auth"
 	"github.com/RavinduSulakshana/auth-service-pandyt/database"
@@ -25,7 +27,36 @@ func NewAuthHandler(db *database.DB, jwtManager *auth.JWTManager) *AuthHandler {
 		jwtManager: jwtManager,
 	}
 }
+func validatePassword(password string) error {
+	if len(password) < 8 {
+		return errors.New("password must be at least 8 characters")
+	}
 
+	var hasLetter, hasDigit bool
+
+	for _, char := range password {
+		if unicode.IsLetter(char) {
+			hasLetter = true
+		}
+		if unicode.IsDigit(char) {
+			hasDigit = true
+		}
+		// Early return if both conditions are met
+		if hasLetter && hasDigit {
+			break
+		}
+	}
+
+	if !hasLetter {
+		return errors.New("password must contain at least one letter")
+	}
+
+	if !hasDigit {
+		return errors.New("password must contain at least one digit")
+	}
+
+	return nil
+}
 func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	var req models.SignupRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -37,9 +68,9 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusBadRequest, "all fields are required")
 		return
 	}
-	//todo : check one letter on one digit
-	if len(req.Password) < 8 {
-		utils.WriteError(w, http.StatusBadRequest, "Password must be least 8 characters")
+	//password validation
+	if err := validatePassword(req.Password); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -204,5 +235,52 @@ func (h *AuthHandler) AuthMiddleware(next http.Handler) http.Handler {
 		ctx := r.Context()
 		ctx = utils.SetUserID(ctx, userID)
 		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+func (h *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, "Invalid request body")
+		return
+	}
+
+	if req.RefreshToken == "" {
+		utils.WriteError(w, http.StatusBadRequest, "Refresh token is required")
+		return
+	}
+
+	// Hash the provided token to compare with stored hash
+	tokenHash := h.jwtManager.HashToken(req.RefreshToken)
+
+	// Get the stored refresh token
+	storedToken, err := h.db.GetRefreshToken(tokenHash)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, "Invalid refresh token")
+		return
+	}
+
+	// Check if token is expired
+	if time.Now().After(storedToken.ExpiresAt) {
+		h.db.DeleteRefreshToken(tokenHash)
+		utils.WriteError(w, http.StatusUnauthorized, "Refresh token expired")
+		return
+	}
+
+	// Delete the old refresh token
+	h.db.DeleteRefreshToken(tokenHash)
+
+	// Generate new tokens
+	tokens, err := h.generateTokens(storedToken.UserID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, "Failed to generate tokens")
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, map[string]interface{}{
+		"message": "Tokens refreshed successfully",
+		"tokens":  tokens,
 	})
 }

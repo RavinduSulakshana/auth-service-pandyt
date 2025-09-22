@@ -8,7 +8,6 @@ import (
 	"github.com/RavinduSulakshana/auth-service-pandyt/database"
 	"github.com/RavinduSulakshana/auth-service-pandyt/handlers"
 	"github.com/RavinduSulakshana/auth-service-pandyt/utils"
-	"github.com/ccojocar/zxcvbn-go/data"
 )
 
 func main() {
@@ -38,8 +37,8 @@ func main() {
 	mux.HandleFunc("POST /auth/refresh", authHandler.RefreshToken)
 
 	//protected routes
-	mux.Handle("GET /auth/profile", authHandler.AuthMiddleware(http.HandleFunc(authHandler.Profile)))
-	mux.HandleFunc("POST /auth/logout", authHandler.AuthMiddleware(http.HandleFunc(authMiddleware.Logout)))
+	mux.Handle("GET /auth/profile", authHandler.AuthMiddleware(http.HandlerFunc(authHandler.Profile)))
+	mux.Handle("POST /auth/logout", authHandler.AuthMiddleware(http.HandlerFunc(authHandler.Logout)))
 
 	//Admin routes
 	mux.HandleFunc("GET /admin/health", adminHandler.Health)
@@ -54,7 +53,7 @@ func main() {
 }
 
 func corsMiddleware(next http.Handler) http.Handler {
-	return http.HandleFunc(func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Admin-Key")

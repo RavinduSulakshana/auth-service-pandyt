@@ -53,7 +53,7 @@ func WriteJSON(w http.ResponseWriter, statusCode int, data interface{}) {
 	json.NewEncoder(w).Encode(data)
 }
 
-func SerUserID(ctx context.Context, userID string) context.Context {
+func SetUserID(ctx context.Context, userID string) context.Context {
 	return context.WithValue(ctx, "user_id", userID)
 }
 func WriteError(w http.ResponseWriter, statusCode int, message string) {
