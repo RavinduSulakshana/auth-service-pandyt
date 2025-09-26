@@ -100,7 +100,7 @@ All JSON requests must include the `Content-Type: application/json` header.
         ```bash
         curl -X POST http://localhost:8080/auth/refresh \
           -H 'Content-Type: application/json' \
-          -d '{"refresh_token":"your_refresh_token_here"}'
+          -d '{"refresh_token":"your_refresh_token"}'
         ```
 
 #### Protected Routes (requires `Authorization: Bearer <access_token>`)
